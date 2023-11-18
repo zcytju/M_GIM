@@ -4,8 +4,14 @@ figure;    doy=19275;
 % Set latitude and longitude range
 lat2=-90;       lat1=90;
 lon1=-180;    lon2=180;
-load(['M_Result/GCER',num2str(doy),'.mat']);
+
 warning off;
+result_folder='M_PLOT';
+if ~exist(result_folder,'dir')
+    mkdir(result_folder);
+end
+
+load(['M_Result/GCER',num2str(doy),'.mat']);
 addpath('Tools/m_map','Tools/m_map/private');
 [site_inf]=Plot_Multisites(lat2,lat1,lon1,lon2,G_R,C_R,E_R,EX_R,R_R,Sites_Info,list_P4);
 saveas(gcf,['M_PLOT/','Global stations.fig'],'fig');

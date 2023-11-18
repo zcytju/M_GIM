@@ -57,6 +57,10 @@ list_sp3=dir('SP3\*.mat');
 list=dir('P4\global\GPS');
 len=length(list);
 disp('Step five: IONC and DCB estimate day by day!')
+result_folder='M_Result';
+if ~exist(result_folder,'dir')
+    mkdir(result_folder);
+end
 if license('test', 'Distrib_Computing_Toolbox')
     mypool=parpool('local',Corenum);
 end

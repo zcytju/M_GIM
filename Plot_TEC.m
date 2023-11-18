@@ -11,6 +11,10 @@ function Plot_TEC(fig,latlim,lonlim,Pname,PaintData,lat1,lat2,lon1,lon2,limmin,l
 %% written by Zhou C. et al., 2020/7/15
 %% ============================================
 warning off;
+result_folder='M_PLOT';
+if ~exist(result_folder,'dir')
+    mkdir(result_folder);
+end
 num=((lat1-lat2)/latlim+1)*((lon2-lon1)/lonlim+1);
 for i=1:fig
 	x=PaintData(1+num*(i-1):num*i,3); 

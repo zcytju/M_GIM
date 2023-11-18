@@ -1,8 +1,8 @@
 %% ==========Plot and write regional ionospheric maps=================
 %% nonintergral SH model
-doy=23037;  fig=24;  K=6;  M=4;
+doy=19275;  fig=24;  K=6;  M=4;
 load('sate_mark.mat');
-load(['M_Result/nonSH_GER',num2str(doy),'.mat']);
+load(['M_Result/nonSH_GCER',num2str(doy),'.mat']);
 warning off;
 addpath('Tools/m_map','Tools/m_map/private');
 lat2=40;     lat1=80;    lon1=0;    lon2=60;

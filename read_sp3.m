@@ -71,7 +71,7 @@ for i=1:len-2
     
     GN=list_obs(i+1).name(12:18);
     filename=strcat(GN,'sp3.mat');
-    if ~exist(s_opath,'dir')
+    if ~isfolder(s_opath)
         mkdir(s_opath);
     end
     save([s_opath,'/',filename],'sate','-mat');
