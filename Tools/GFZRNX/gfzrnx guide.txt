@@ -1,0 +1,13 @@
+1. Put the gfzrnx.exe software into the current observation data folder
+2. Change the execution directory to the current data directory
+   cmd command  
+     >E:
+     >cd E:\Desktop\result\2019275
+3. Execute relevant command operation		
+          Rinex 2.11 to 3.02£º
+              >for %a in (*.19o) do gfzrnx -finp %a -fout %a%a -vo 3.02
+          Rinex 2.11 to 3.02 and saved GPS-only
+              >for %a in (*.19o) do gfzrnx -finp %a -fout %a%a -vo 3.02 -satsys G
+          Only the specific observation type is reserved
+              >for %a in (*.19o) do gfzrnx -finp %a -obs_types L,P,C -kv > %a%a
+

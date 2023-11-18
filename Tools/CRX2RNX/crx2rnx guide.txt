@@ -1,0 +1,9 @@
+crx2rnx: convert COMPACT RINEX FORMAT to RINEX format
+1. Put the crx2rnx.exe software into the current observation data folder
+2. Change the execution directory to the current data directory
+   cmd command  
+     >E:
+     >cd E:\Desktop\result\2019275
+3. Execute relevant command operation
+     >for %a in (*.crx) do crx2rnx %a
+     >for %a in (*.19d) do crx2rnx %a
