@@ -1,0 +1,17 @@
+# Ignore the following folders 
+Files_dcb/
+Files_ionex/
+Files_rinex/
+Files_SP3/
+M_PLOT/
+M_Result/
+OBS/
+P4/
+SP3/
+
+# Ignore the following files
+*.rnx
+*.**o
+*.SP3
+*.BSX
+*.**i

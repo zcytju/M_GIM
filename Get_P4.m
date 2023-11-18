@@ -36,7 +36,7 @@ for i=1:len
     
     if ~isnan(find(strcmp(fields, 'GPSC1W' )))
         if ~(all(all(obs.GPSC1W==0)) || all(all(obs.GPSC2W==0)))
-            [GPSP4]=GPS_prepro(obs);
+            [GPSP4]=GPS_prepro(obs,sate_mark);
             if all(all(GPSP4==0))
                 continue;
             end
@@ -50,7 +50,7 @@ for i=1:len
     
     if ~isnan(find(strcmp(fields, 'GLOC1P' )))
         if ~(all(all(obs.GLOC1P==0)) || all(all(obs.GLOC2P==0)))
-            [GLOP4]=GLO_prepro(obs);
+            [GLOP4]=GLO_prepro(obs,sate_mark);
             if all(all(GLOP4==0))
                 continue;
             end
@@ -64,7 +64,7 @@ for i=1:len
     
     if ~isnan(find(strcmp(fields, 'BDSC2I' )))
         if ~(all(all(obs.BDSC2I==0)) || all(all(obs.BDSC7I==0)))
-            [BDSP4]=BDS_prepro(obs);
+            [BDSP4]=BDS_prepro(obs,sate_mark);
             if all(all(BDSP4==0))
                 continue;
             end
@@ -78,7 +78,7 @@ for i=1:len
     
     if ~isnan(find(strcmp(fields, 'GALC1C' )))
         if ~(all(all(obs.GALC1C==0)) || all(all(obs.GALC5Q==0)))
-            [GALP4]=GAL_prepro(obs);
+            [GALP4]=GAL_prepro(obs,sate_mark);
             if all(all(GALP4==0))
                 continue;
             end
@@ -90,7 +90,7 @@ for i=1:len
         end
     elseif ~isnan(find(strcmp(fields, 'GALC1X' )))
         if ~(all(all(obs.GALC1X==0)) || all(all(obs.GALC5X==0)))
-            [GALXP4]=GALX_prepro(obs);
+            [GALXP4]=GALX_prepro(obs,sate_mark);
             if all(all(GALXP4==0))
                 continue;
             end
@@ -161,6 +161,9 @@ if ~isnan(find(strcmp(fields, 'GPSC1W' )))
 
     for i=1:gpsnum
         for j=1:2880
+            if size(obs.GPSL1C, 2) ~= gpsnum
+                continue;
+            end
             if obs.GPSL1C(j,i)==0 || obs.GPSL2W(j,i)==0 || obs.GPSC1W(j,i)==0 || obs.GPSC2W(j,i)==0
                 obs.GPSL1C(j,i)=0;obs.GPSL2W(j,i)=0;obs.GPSC1W(j,i)=0;obs.GPSC2W(j,i)=0;
                 continue;
@@ -213,6 +216,9 @@ if ~isnan(find(strcmp(fields, 'GLOC1P' )))
 
     for i=1:glonum
         for j=1:2880
+            if size(obs.GLOL1P, 2) ~= glonum
+                continue;
+            end
             if obs.GLOL1P(j,i)==0 || obs.GLOL2P(j,i)==0 || obs.GLOC1P(j,i)==0 || obs.GLOC2P(j,i)==0
                 obs.GLOL1P(j,i)=0;obs.GLOL2P(j,i)=0;obs.GLOC1P(j,i)=0;obs.GLOC2P(j,i)=0;
                 continue;
@@ -265,8 +271,7 @@ if ~isnan(find(strcmp(fields, 'BDSC2I' )))
 
     for i=1:bdsnum
         for j=1:2880
-            fprintf('%4d, %4d, %4d, %4d \n', size(obs.BDSL2I, 1), size(obs.BDSL7I, 2), size(obs.BDSC2I,1), size(obs.BDSC7I,2));
-            if size(obs.BDSL7I, 2) ~= 15
+            if size(obs.BDSL2I, 2) ~= bdsnum
                 continue;
             end
             if obs.BDSL2I(j,i)==0 || obs.BDSL7I(j,i)==0 || obs.BDSC2I(j,i)==0 || obs.BDSC7I(j,i)==0
@@ -322,6 +327,9 @@ if ~isnan(find(strcmp(fields, 'GALC1X' )))
 
     for i=1:galnum
         for j=1:2880
+            if size(obs.GALL1X, 2) ~= galnum
+                continue;
+            end
             if obs.GALL1X(j,i)==0 || obs.GALL5X(j,i)==0 || obs.GALC1X(j,i)==0 || obs.GALC5X(j,i)==0
                 obs.GALL1X(j,i)=0;obs.GALL5X(j,i)=0;obs.GALC1X(j,i)=0;obs.GALC5X(j,i)=0;
                 continue;
@@ -373,6 +381,9 @@ elseif ~isnan(find(strcmp(fields, 'GALC1C' )))
 
     for i=1:galnum
         for j=1:2880
+            if size(obs.GALL1C, 2) ~= galnum
+                continue;
+            end
             if obs.GALL1C(j,i)==0 || obs.GALL5Q(j,i)==0 || obs.GALC1C(j,i)==0 || obs.GALC5Q(j,i)==0
                 obs.GALL1C(j,i)=0;obs.GALL5Q(j,i)=0;obs.GALC1C(j,i)=0;obs.GALC5Q(j,i)=0;
                 continue;
@@ -387,7 +398,7 @@ elseif ~isnan(find(strcmp(fields, 'GALC1C' )))
 end
 end
 %% ---------------------------subfunction----------------------------------
-function [GPSPP4]=GPS_prepro(obs)
+function [GPSPP4]=GPS_prepro(obs,sate_mark)
 %% get smoothed GPS P4 observations
 % INPUT:
 %      obs: struct of rinex files
@@ -395,14 +406,16 @@ function [GPSPP4]=GPS_prepro(obs)
 %     GPSPP4: smoothed GPS P4 observation
 %% --------------------------------------------------------------------------
 %____delete incomplete epoch_____
+validsats=sum(sate_mark.gps);
+size1=size(obs.GPSC1W,1);
 size2=size(obs.GPSC1W,2);
-if size2<32
-    obs.GPSC1W(:,size2+1:32)=0;obs.GPSC2W(:,size2+1:32)=0;
-    obs.GPSL1C(:,size2+1:32)=0;obs.GPSL2W(:,size2+1:32)=0;
+if size2<validsats
+    obs.GPSC1W(:,size2+1:validsats)=0;obs.GPSC2W(:,size2+1:validsats)=0;
+    obs.GPSL1C(:,size2+1:validsats)=0;obs.GPSL2W(:,size2+1:validsats)=0;
 end
-GPSP4=zeros(2880,32);
-GPSL4=zeros(2880,32);
-GPSPP4=zeros(2880,32);
+GPSP4=zeros(size1,validsats);
+GPSL4=zeros(size1,validsats);
+GPSPP4=zeros(size1,validsats);
 c=299792458;                     %__________________________speed of light
 GPS_f1=1575.42*10^6;                 %_________________________________unit:Hz
 GPS_f2=1227.6*10^6;                  %_________________________________unit:Hz
@@ -410,7 +423,7 @@ lamda_w=299792458/(GPS_f1-GPS_f2);       %____________________wide lane waveleng
 L6=lamda_w*(obs.GPSL1C-obs.GPSL2W)-(GPS_f1*obs.GPSC1W+GPS_f2*obs.GPSC2W)/(GPS_f1+GPS_f2); %__MW observable
 Li=obs.GPSL1C-GPS_f1*obs.GPSL2W/GPS_f2;
 Nw=-L6;                   %_____________________wide lane ambiguity
-for i=1:32  %i is PRN number
+for i=1:validsats  %i is PRN number
     %------divide arc---------------------------
     arc=Get_arc(L6(:,i));
     [arc_n,aaa]=size(arc);
@@ -557,7 +570,7 @@ end
 end
 
 %% ------------------------subfunction----------------------------
-function [GLOPP4]=GLO_prepro(obs)
+function [GLOPP4]=GLO_prepro(obs,sate_mark)
 %% get smoothed GLONASS P4 observations
 % INPUT:
 %      obs: struct of rinex files
@@ -565,16 +578,18 @@ function [GLOPP4]=GLO_prepro(obs)
 %     GLOPP4: smoothed GLONASS P4 observation
 %% ------------------------------------------------------------------
 %____delete incomplete epoch_____
+validsats=sum(sate_mark.glo);
+size1=size(obs.GLOC1P,1);
 size2=size(obs.GLOC1P,2);
-if size2<21
-    obs.GLOC1P(:,size2+1:24)=0;obs.GLOC2P(:,size2+1:24)=0;
-    obs.GLOL1P(:,size2+1:24)=0;obs.GLOL2P(:,size2+1:24)=0;
+if size2<validsats
+    obs.GLOC1P(:,size2+1:validsats)=0;obs.GLOC2P(:,size2+1:validsats)=0;
+    obs.GLOL1P(:,size2+1:validsats)=0;obs.GLOL2P(:,size2+1:validsats)=0;
 end
-GLOP4=zeros(2880,21);
-GLOL4=zeros(2880,21);
-GLOPP4=zeros(2880,21);
+GLOP4=zeros(size1,validsats);
+GLOL4=zeros(size1,validsats);
+GLOPP4=zeros(size1,validsats);
 c=299792458;                     %__________________________speed of light
-for i=1:21
+for i=1:validsats
     Fre=[1,-4, 5, 1, 5, 6, -2, 0, -1, -2, -7, 0, -1, 4, -3, 3, 2, 4, -3, 3, 2];
     %      Fre=[1,-4, 5, 6, 1, -4, 5, 6, -2, -7, 0, -1, -2, -7, 0, -1, 4, -3, 3, 2, 4, -3, 3, 2];
     GLO_f1(i)=(1602+Fre(i)*0.5625)*10^6;                 %_________________________________unit:Hz
@@ -584,7 +599,7 @@ for i=1:21
     Li(:,i)=obs.GLOL1P(:,i)-GLO_f1(i)*obs.GLOL2P(:,i)/GLO_f2(i);
     Nw(:,i)=-L6(:,i);               %_____________________wide lane ambiguity
 end
-for i=1:21  %i is PRN number
+for i=1:validsats  %i is PRN number
     %------divide arc---------------------------
     arc=Get_arc(L6(:,i));
     [arc_n,aaa]=size(arc);
@@ -731,7 +746,7 @@ end
 end
 
 %% ---------------------------subfunction-------------------------
-function [BDSPP4]=BDS_prepro(obs)
+function [BDSPP4]=BDS_prepro(obs,sate_mark)
 %% get smoothed BDS P4 observations
 % INPUT:
 %      obs: struct of rinex files
@@ -739,14 +754,16 @@ function [BDSPP4]=BDS_prepro(obs)
 %     BDSPP4: smoothed BDS P4 observation
 %% -----------------------------------------------------------------
 %____delete incomplete epoch_____
+validsats=sum(sate_mark.bds);
+size1=size(obs.BDSC2I,1);
 size2=size(obs.BDSC2I,2);
-if size2<15
-    obs.BDSC2I(:,size2+1:15)=0;obs.BDSC7I(:,size2+1:15)=0;
-    obs.BDSL2I(:,size2+1:15)=0;obs.BDSL7I(:,size2+1:15)=0;
+if size2<validsats
+    obs.BDSC2I(:,size2+1:validsats)=0;obs.BDSC7I(:,size2+1:validsats)=0;
+    obs.BDSL2I(:,size2+1:validsats)=0;obs.BDSL7I(:,size2+1:validsats)=0;
 end
-BDSP4=zeros(2880,15);
-BDSL4=zeros(2880,15);
-BDSPP4=zeros(2880,15);
+BDSP4=zeros(size1,validsats);
+BDSL4=zeros(size1,validsats);
+BDSPP4=zeros(size1,validsats);
 c=299792458;                     %__________________________speed of light
 BDS_f2=1561.098*10^6;                 %_________________________________unit:Hz
 BDS_f7=1207.140*10^6;                  %_________________________________unit:Hz
@@ -754,7 +771,7 @@ lamda_w=299792458/(BDS_f2-BDS_f7);       %____________________wide lane waveleng
 L6=lamda_w*(obs.BDSL2I-obs.BDSL7I)-(BDS_f2*obs.BDSC2I+BDS_f7*obs.BDSC7I)/(BDS_f2+BDS_f7); %__MW observable
 Li=obs.BDSL2I-BDS_f2*obs.BDSL7I/BDS_f7;
 Nw=-L6;                   %_____________________wide lane ambiguity
-for i=1:15  %i is PRN number
+for i=1:validsats  %i is PRN number
     %------divide arc---------------------------
     arc=Get_arc(L6(:,i));
     [arc_n,aaa]=size(arc);
@@ -901,7 +918,7 @@ end
 end
 
 %% --------------------------subfunction--------------------------
-function [GALPP4]=GAL_prepro(obs)
+function [GALPP4]=GAL_prepro(obs,sate_mark)
 %% get smoothed Galileo P4 observations
 % INPUT:
 %      obs: struct of rinex files
@@ -909,14 +926,16 @@ function [GALPP4]=GAL_prepro(obs)
 %     GALPP4: smoothed Galileo P4 observation
 %% ------------------------------------------------------------------
 %____delete incomplete epoch_____
+validsats=sum(sate_mark.gal);
+size1=size(obs.GALC1C,1);
 size2=size(obs.GALC1C,2);
-if size2<24
-    obs.GALL1C(:,size2+1:24)=0;obs.GALL5Q(:,size2+1:24)=0;
-    obs.GALC1C(:,size2+1:24)=0;obs.GALC5Q(:,size2+1:24)=0;
+if size2<validsats
+    obs.GALL1C(:,size2+1:validsats)=0;obs.GALL5Q(:,size2+1:validsats)=0;
+    obs.GALC1C(:,size2+1:validsats)=0;obs.GALC5Q(:,size2+1:validsats)=0;
 end
-GALP4=zeros(2880,24);
-GALL4=zeros(2880,24);
-GALPP4=zeros(2880,24);
+GALP4=zeros(size1,validsats);
+GALL4=zeros(size1,validsats);
+GALPP4=zeros(size1,validsats);
 c=299792458;                     %__________________________speed of light
 GAL_f1=1575.42*10^6;                 %_________________________________unit:Hz
 GAL_f5=1176.45*10^6;                  %_________________________________unit:Hz
@@ -924,7 +943,7 @@ lamda_w=299792458/(GAL_f1-GAL_f5);       %____________________wide lane waveleng
 L6=lamda_w*(obs.GALL1C-obs.GALL5Q)-(GAL_f1*obs.GALC1C+GAL_f5*obs.GALC5Q)/(GAL_f1+GAL_f5); %__MW observable
 Li=obs.GALL1C-GAL_f1*obs.GALL5Q/GAL_f5;
 Nw=-L6;                   %_____________________wide lane ambiguity
-for i=1:24  %i is PRN number
+for i=1:validsats  %i is PRN number
     %------divide arc---------------------------
     arc=Get_arc(L6(:,i));
     [arc_n,aaa]=size(arc);
@@ -1042,10 +1061,7 @@ for i=1:24  %i is PRN number
         end
         j=j+1;
     end
-    fprintf('%4d, %4d, %4d, %4d, %4d, %4d \n', size(GALP4(:,i),1), size(GALP4(:,i),2), size(obs.GALC1C(:,i), 1), size(obs.GALC1C(:,i), 2), size(obs.GALC5Q(:,i),1), size(obs.GALC5Q(:,i),2));
-    if size(obs.GALC1C(:,i), 1) ~= 2880
-        continue;
-    end
+    
     GALP4(:,i)=obs.GALC1C(:,i)-obs.GALC5Q(:,i);
     GALL4(:,i)=(c/GAL_f1)*obs.GALL1C(:,i)-(c/GAL_f5)*obs.GALL5Q(:,i);
     
@@ -1075,7 +1091,7 @@ end
 end
 
 %% --------------------------subfunction----------------------------
-function [GALXPP4]=GALX_prepro(obs)
+function [GALXPP4]=GALX_prepro(obs,sate_mark)
 %% get smoothed Galileo P4 observations
 % INPUT:
 %      obs: struct of rinex files
@@ -1083,14 +1099,16 @@ function [GALXPP4]=GALX_prepro(obs)
 %     GALXPP4: smoothed Galileo P4 observation
 %% --------------------------------------------------------------------
 %____delete incomplete epoch_____
+validsats=sum(sate_mark.gal);
+size1=size(obs.GALC1X,1);
 size2=size(obs.GALC1X,2);
-if size2<24
-    obs.GALL1X(:,size2+1:24)=0;obs.GALL5X(:,size2+1:24)=0;
-    obs.GALC1X(:,size2+1:24)=0;obs.GALC5X(:,size2+1:24)=0;
+if size2<validsats
+    obs.GALL1X(:,size2+1:validsats)=0;obs.GALL5X(:,size2+1:validsats)=0;
+    obs.GALC1X(:,size2+1:validsats)=0;obs.GALC5X(:,size2+1:validsats)=0;
 end
-GALXP4=zeros(2880,24);
-GALXL4=zeros(2880,24);
-GALXPP4=zeros(2880,24);
+GALXP4=zeros(size1,validsats);
+GALXL4=zeros(size1,validsats);
+GALXPP4=zeros(size1,validsats);
 c=299792458;                     %__________________________speed of light
 GALX_f1=1575.42*10^6;                 %_________________________________unit:Hz
 GALX_f5=1176.45*10^6;                 %_________________________________unit:Hz
@@ -1098,7 +1116,7 @@ lamda_w=299792458/(GALX_f1-GALX_f5);       %____________________wide lane wavele
 L6=lamda_w*(obs.GALL1X-obs.GALL5X)-(GALX_f1*obs.GALC1X+GALX_f5*obs.GALC5X)/(GALX_f1+GALX_f5); %__MW observable
 Li=obs.GALL1X-GALX_f1*obs.GALL5X/GALX_f5;
 Nw=-L6;                   %_____________________wide lane ambiguity
-for i=1:24  %i is PRN number
+for i=1:validsats  %i is PRN number
     %------divide arc---------------------------
     arc=Get_arc(L6(:,i));
     [arc_n,aaa]=size(arc);

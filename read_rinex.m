@@ -19,7 +19,7 @@ if isempty(list_obs)
 end
 len=length(list_obs);
 %creat the folder which shores the L1, L2, P1, P2 observations
-if exist(r_opath,'dir')==0 
+if ~exist(r_opath,'dir')
     mkdir(r_opath);
 end  
 %--Get P1,P2,L1,L2 and receivers coordinates

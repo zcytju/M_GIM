@@ -29,7 +29,7 @@ disp('MDCB(multi-stations) starts running!');
 % --L1,L2,P1,P2 and coordinates of GPS receviers are obtained by this step
 r_opath='OBS\regional';
 disp('Step one: read rinex files !');
-% Sites_Info=read_rinex(r_ipath,r_opath);
+Sites_Info=read_rinex(r_ipath,r_opath);
 disp('Step one: completing !');
 %Step two--------------------Read SP3 files--------------------------------
 %--Get satellites coordinates and interpolation
@@ -37,12 +37,12 @@ disp('Step one: completing !');
 s_opath='SP3';
 disp('Step two: read SP3 files !');
 load('sate_mark.mat');
-% read_sp3(s_ipath,s_opath,sate_mark);
+read_sp3(s_ipath,s_opath,sate_mark);
 disp('Step two: completing !');
 %Step three------------------Read ionex files------------------------------
 %--Get reference information
 disp('Step three: read DCB files !');
-% [SDCB_REF,Sites_Info]= read_dcb(i_ipath,Sites_Info,sate_mark);
+[SDCB_REF,Sites_Info]= read_dcb(i_ipath,Sites_Info,sate_mark);
 disp('Step three: completing !');
 % 
 %Step four---------------Ionosphere Observations-----------------------
@@ -50,7 +50,7 @@ disp('Step three: completing !');
 disp('Step four: data pre-processing and get ionospheric observations !')
 p_opath='P4\regional';
 addpath('Func_nonSH','Tools\M_DCB');
-% Get_P4(r_opath,p_opath,s_opath,Sites_Info,lim*pi/180,sate_mark);
+Get_P4(r_opath,p_opath,s_opath,Sites_Info,lim*pi/180,sate_mark);
 disp('Step four: completing !')
 %Step five----------------------Get M_GIM----------------------------------
 list_sp3=dir('SP3\*.mat');
