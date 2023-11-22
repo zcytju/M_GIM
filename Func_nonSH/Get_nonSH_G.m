@@ -44,7 +44,7 @@ if isempty(d_sat)
 else
     G_n_s=32-length(d_sat);%the number of satellites
     disp([doy ' PRN ',num2str(d_sat) ,' have no observations.']);
-    for k=length(gps_d_sat):-1:1
+    for k=length(d_sat):-1:1
         gpsx(:,d_sat(k))=[];gpsy(:,d_sat(k))=[];gpsz(:,d_sat(k))=[];
     end
 end
@@ -69,7 +69,7 @@ for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
     if ~isempty(d_sat)
         for k=length(d_sat):-1:1
-            GPSP4(:,k)=[];
+            GPSP4(:,d_sat(k))=[];
         end
     end
     site=list_gps(i).name(1:4);

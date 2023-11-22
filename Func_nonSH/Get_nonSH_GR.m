@@ -114,7 +114,7 @@ for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
     if ~isempty(gps_d_sat)
         for k=length(gps_d_sat):-1:1
-            GPSP4(:,k)=[];
+            GPSP4(:,gps_d_sat(k))=[];
         end
     end
     site=list_gps(i).name(1:4);
@@ -138,7 +138,7 @@ for i=1:R_n_r
     load([path_R '/' list_glo(i).name],'-mat');
     if ~isempty(glo_d_sat)
         for k=length(glo_d_sat):-1:1
-            GLOP4(:,k)=[];
+            GLOP4(:,glo_d_sat(k))=[];
         end
     end
     site=list_glo(i).name(1:4);

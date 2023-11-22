@@ -18,21 +18,25 @@ Sites_Info.GLO_RDCB_REF=linspace(0,0,len);
 Sites_Info.BDS_RDCB_REF=linspace(0,0,len);
 Sites_Info.GAL_RDCB_REF=linspace(0,0,len);
 Sites_Info.GALX_RDCB_REF=linspace(0,0,len);
-SDCB_REF.gps=zeros(n_d,32);
-SDCB_REF.glo=zeros(n_d,24);
-SDCB_REF.bds=zeros(n_d,16);
-SDCB_REF.gal=zeros(n_d,36);
-SDCB_REF.galx=zeros(n_d,36);
+gpsnum=size(sate_mark.gps,2);
+bdsnum=size(sate_mark.bds,2);
+galnum=size(sate_mark.gal,2);
+glonum=size(sate_mark.glo,2);
+SDCB_REF.gps=zeros(n_d,gpsnum);
+SDCB_REF.glo=zeros(n_d,glonum);
+SDCB_REF.bds=zeros(n_d,bdsnum);
+SDCB_REF.gal=zeros(n_d,galnum);
+SDCB_REF.galx=zeros(n_d,galnum);
 SDCB_REF.doy=linspace(0,0,n_d);
 
 for i=1:n_d
     sdoy=doys(i);
     index2= Sites_Info.doy==doys(i);
-    [GPS_DCB_rec,SDCB_REF.gps(i,:)]=r_gps_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2));
-    [GLO_DCB_rec,SDCB_REF.glo(i,:)]=r_glo_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2));
-    [BDS_DCB_rec,SDCB_REF.bds(i,:)]=r_bds_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2));
-    [GAL_DCB_rec,SDCB_REF.gal(i,:)]=r_gal_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2));
-    [GALX_DCB_rec,SDCB_REF.galx(i,:)]=r_galx_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2));
+    [GPS_DCB_rec,SDCB_REF.gps(i,:)]=r_gps_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2),gpsnum);
+    [GLO_DCB_rec,SDCB_REF.glo(i,:)]=r_glo_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2),glonum);
+    [BDS_DCB_rec,SDCB_REF.bds(i,:)]=r_bds_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2),bdsnum);
+    [GAL_DCB_rec,SDCB_REF.gal(i,:)]=r_gal_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2),galnum);
+    [GALX_DCB_rec,SDCB_REF.galx(i,:)]=r_galx_dcb([i_ipath '/CAS0MGXRAP_20' num2str(sdoy) '0000_01D_01D_DCB.BSX'],Sites_Info.name(index2),galnum);
     Sites_Info.GPS_RDCB_REF(index2)=GPS_DCB_rec;
     Sites_Info.GLO_RDCB_REF(index2)=GLO_DCB_rec;
     Sites_Info.BDS_RDCB_REF(index2)=BDS_DCB_rec;
@@ -81,7 +85,7 @@ end
 end
 
 %% ------------------------------sub function-------------------------------
-function [DCB_rec,DCB_sat]=r_galx_dcb(fpath,sites)
+function [DCB_rec,DCB_sat]=r_galx_dcb(fpath,sites,satnum)
 fid=fopen(fpath,'r');
 n_r=length(sites);
 DCB_rec=linspace(0,0,n_r);
@@ -105,9 +109,12 @@ while 1
     end
 end
 fclose(fid);
+if length(DCB_sat)>satnum
+    DCB_sat(satnum+1:end)=[];
+end
 end
 %% ------------------------------sub function-------------------------------
-function [DCB_rec,DCB_sat]=r_gal_dcb(fpath,sites)
+function [DCB_rec,DCB_sat]=r_gal_dcb(fpath,sites,satnum)
 fid=fopen(fpath,'r');
 n_r=length(sites);
 DCB_rec=linspace(0,0,n_r);
@@ -131,9 +138,12 @@ while 1
     end
 end
 fclose(fid);
+if length(DCB_sat)>satnum
+    DCB_sat(satnum+1:end)=[];
+end
 end
 %% ------------------------------sub function-------------------------------
-function [DCB_rec,DCB_sat]=r_bds_dcb(fpath,sites)
+function [DCB_rec,DCB_sat]=r_bds_dcb(fpath,sites,satnum)
 fid=fopen(fpath,'r');
 n_r=length(sites);
 DCB_rec=linspace(0,0,n_r);
@@ -157,9 +167,12 @@ while 1
     end
 end
 fclose(fid);
+if length(DCB_sat)>satnum
+    DCB_sat(satnum+1:end)=[];
+end
 end
 %% ------------------------------sub function-------------------------------
-function [DCB_rec,DCB_sat]=r_glo_dcb(fpath,sites)
+function [DCB_rec,DCB_sat]=r_glo_dcb(fpath,sites,satnum)
 fid=fopen(fpath,'r');
 n_r=length(sites);
 DCB_rec=linspace(0,0,n_r);
@@ -183,9 +196,12 @@ while 1
     end
 end
 fclose(fid);
+if length(DCB_sat)>satnum
+    DCB_sat(satnum+1:end)=[];
+end
 end
 %% ------------------------------sub function-------------------------------
-function [DCB_rec,DCB_sat]=r_gps_dcb(fpath,sites)
+function [DCB_rec,DCB_sat]=r_gps_dcb(fpath,sites,satnum)
 fid=fopen(fpath,'r');
 n_r=length(sites);
 DCB_rec=linspace(0,0,n_r);
@@ -210,4 +226,7 @@ while 1
     end
 end
 fclose(fid);
+if length(DCB_sat)>satnum
+    DCB_sat(satnum+1:end)=[];
+end
 end

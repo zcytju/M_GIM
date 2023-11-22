@@ -77,7 +77,7 @@ for i=3:len
     list_P4.glo=dir([p_opath '\GLO\',doy,'\*.mat']);
     
     if strcmp(system,'G')
-            [G_R, G_S, IONC, m0, NN]= Get_nonSH_G(fig,doy,Sites_Info,sate,SDCB_REF,K,M,PG);
+        [G_R, G_S, IONC, m0, NN]= Get_nonSH_G(fig,doy,Sites_Info,sate,SDCB_REF,K,M,PG);
         fname=['M_Result\nonSH_G' doy '.mat'];
         save(fname,'G_R','G_S','IONC','m0','NN','SDCB_REF','Sites_Info','total_station','list_P4','-mat');
     end
