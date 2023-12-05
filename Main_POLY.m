@@ -79,42 +79,42 @@ for i=3:len
     list_P4.glo=dir([p_opath '\GLO\',doy,'\*.mat']);
     
     if strcmp(system,'G')
-        [G_R, G_S, IONC, m0, NN]= Get_POLY_G(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG);
+        [G_R, G_S, IONC, m0, NN]= Get_POLY_G(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,sate_mark);
         fname=['M_Result\POLY_G' doy '.mat'];
         save(fname,'G_R','G_S','IONC','m0','NN','SDCB_REF','Sites_Info','total_station','list_P4','-mat');
     end
     if strcmp(system,'GC')
-        [G_R, G_S, C_R, C_S, IONC,m0,NN]= Get_POLY_GC(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC);
+        [G_R, G_S, C_R, C_S, IONC,m0,NN]= Get_POLY_GC(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC,sate_mark);
         fname=['M_Result\POLY_GC' doy '.mat'];
         save(fname,'G_R','G_S','C_R','C_S','IONC','m0','NN','SDCB_REF','Sites_Info','total_station','list_P4','-mat');
     end
     if strcmp(system,'GE')
-        [G_R, G_S, E_R, E_S, EX_R, EX_S, IONC,m0,NN]= Get_POLY_GE(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PE);
+        [G_R, G_S, E_R, E_S, EX_R, EX_S, IONC,m0,NN]= Get_POLY_GE(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PE,sate_mark);
         fname=['M_Result\POLY_GE' doy '.mat'];
         save(fname,'G_R','G_S','E_R','E_S','EX_R','EX_S','IONC','m0','NN','SDCB_REF','Sites_Info','total_station','list_P4','-mat');
     end
     if strcmp(system,'GR')
-        [G_R, G_S, R_R, R_S, IONC,m0,NN]= Get_POLY_GR(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PR);
+        [G_R, G_S, R_R, R_S, IONC,m0,NN]= Get_POLY_GR(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PR,sate_mark);
         fname=['M_Result\POLY_GR' doy '.mat'];
         save(fname,'G_R','G_S','R_R','R_S','IONC','m0','NN','SDCB_REF','Sites_Info','total_station','list_P4','-mat');
     end
     if strcmp(system,'GCE')
-        [G_R, G_S, E_R, E_S, EX_R, EX_S, C_R, C_S, IONC, m0, NN] = Get_POLY_GCE(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC,PE);
+        [G_R, G_S, E_R, E_S, EX_R, EX_S, C_R, C_S, IONC, m0, NN] = Get_POLY_GCE(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC,PE,sate_mark);
         fname=['M_Result\POLY_GCE' doy '.mat'];
         save(fname,'G_R','G_S','C_R','C_S','E_R','E_S','EX_R','EX_S','IONC','m0','NN','SDCB_REF','Sites_Info','total_station','list_P4','-mat');
     end
     if strcmp(system,'GCR')
-        [G_R, G_S, C_R, C_S, R_R, R_S, IONC, m0, NN] = Get_POLY_GCR(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC,PR);
+        [G_R, G_S, C_R, C_S, R_R, R_S, IONC, m0, NN] = Get_POLY_GCR(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC,PR,sate_mark);
         fname=['M_Result\POLY_GCR' doy '.mat'];
         save(fname,'G_R','G_S','C_R','C_S','R_R','R_S','IONC','m0','NN','SDCB_REF','Sites_Info','total_station','list_P4','-mat');
     end
     if strcmp(system,'GER')
-        [G_R, G_S, E_R, E_S, EX_R, EX_S, R_R, R_S, IONC, m0, NN] = Get_POLY_GER(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PE,PR);
+        [G_R, G_S, E_R, E_S, EX_R, EX_S, R_R, R_S, IONC, m0, NN] = Get_POLY_GER(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PE,PR,sate_mark);
         fname=['M_Result\POLY_GER' doy '.mat'];
         save(fname,'G_R','G_S','R_R','R_S','E_R','E_S','EX_R','EX_S','IONC','m0','NN','SDCB_REF','Sites_Info','total_station','list_P4','-mat');
     end
     if strcmp(system,'GCER')
-        [G_R, G_S, E_R, E_S, EX_R, EX_S, C_R, C_S, R_R, R_S, IONC, m0, NN] = Get_POLY_GCER(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC,PE,PR);
+        [G_R, G_S, E_R, E_S, EX_R, EX_S, C_R, C_S, R_R, R_S, IONC, m0, NN] = Get_POLY_GCER(fig,doy,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC,PE,PR,sate_mark);
         fname=['M_Result\POLY_GCER' doy '.mat'];
         save(fname,'G_R','G_S','C_R','C_S','R_R','R_S','E_R','E_S','EX_R','EX_S','IONC','m0','NN','SDCB_REF','Sites_Info','total_station','list_P4','-mat');
     end

@@ -1,4 +1,4 @@
-function [G_R, G_S, R_R, R_S, IONC, m0, NN] = Get_nonSH_GR(fig,doy ,Sites_Info,sate,SDCB_REF,K,M,PG,PR)
+function [G_R, G_S, R_R, R_S, IONC, m0, NN] = Get_nonSH_GR(fig,doy ,Sites_Info,sate,SDCB_REF,K,M,PG,PR,sate_mark)
 %%  estimate satellite and receiver DCBs, ionospheric parameters, et al.
 %%  produced from 'Get_MDCB.m' in M_DCB 
 % INPUT:
@@ -26,11 +26,12 @@ path_G=['P4/regional/GPS/' doy];
 list_gps=dir([path_G '/*.mat']);
 G_n_r=length(list_gps);%the number of receivers
 %--check the number of each satellite's observations 
-G_PRN=linspace(0,0,32);
-G_S=linspace(0,0,32);
+gpsnum=sum(sate_mark.gps);
+G_PRN=linspace(0,0,gpsnum);
+G_S=linspace(0,0,gpsnum);
 for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
-    for j=1:32
+    for j=1:gpsnum
         for k=1:2880
             if GPSP4(k,j)~=0
                 G_PRN(j)=G_PRN(j)+1;
@@ -41,16 +42,16 @@ for i=1:G_n_r
 end
 gps_d_sat=find(G_PRN==0);
 if isempty(gps_d_sat)
-    G_n_s=32;
+    G_n_s=gpsnum;
 else
-    G_n_s=32-length(gps_d_sat);%the number of satellites
+    G_n_s=gpsnum-length(gps_d_sat);%the number of satellites
     disp(['doy ', doy ,' GPS PRN ',num2str(gps_d_sat) ,' have no observations.']);
     for k=length(gps_d_sat):-1:1
         gpsx(:,gps_d_sat(k))=[];gpsy(:,gps_d_sat(k))=[];gpsz(:,gps_d_sat(k))=[];
     end
 end
 
-if G_n_s==32
+if G_n_s==gpsnum
     G_Wx=0;
 else
     %Satellites DCB values must be exsist in related ionox files
@@ -65,11 +66,12 @@ path_R=['P4/regional/GLO/' doy];
 list_glo=dir([path_R '/*.mat']);
 R_n_r=length(list_glo);%the number of receivers
 %--check the number of each satellite's observations 
-R_PRN=linspace(0,0,21);
-R_S=linspace(0,0,21);
+glonum=sum(sate_mark.glo);
+R_PRN=linspace(0,0,glonum);
+R_S=linspace(0,0,glonum);
 for i=1:R_n_r
     load([path_R '/' list_glo(i).name],'-mat');
-    for j=1:21
+    for j=1:glonum
         for k=1:2880
             if GLOP4(k,j)~=0
                 R_PRN(j)=R_PRN(j)+1;
@@ -80,15 +82,15 @@ for i=1:R_n_r
 end
 glo_d_sat=find(R_PRN==0);
 if isempty(glo_d_sat)
-    R_n_s=21;
+    R_n_s=glonum;
 else
-    R_n_s=21-length(glo_d_sat);%the number of satellites
+    R_n_s=glonum-length(glo_d_sat);%the number of satellites
     disp(['doy ', doy ,' GLO PRN ',num2str(glo_d_sat) ,' have no observations.']);
     for k=length(glo_d_sat):-1:1
         glox(:,glo_d_sat(k))=[];gloy(:,glo_d_sat(k))=[];gloz(:,glo_d_sat(k))=[];
     end
 end
-if R_n_s==21
+if R_n_s==glonum
     R_Wx=0;
 else
     %Satellites DCB values must be exsist in related ionox files
@@ -163,12 +165,12 @@ U=U+C_GPS'*G_Wx+C_GLO'*R_Wx;
 L=L+G_Wx'*G_Wx+R_Wx'*R_Wx;
 R=pinv(N)*U;
 G_R=R(1:G_n_r)*10^9/299792458;
-temp_gps=linspace(1,32,32);
+temp_gps=linspace(1,gpsnum,gpsnum);
 temp_gps(gps_d_sat)=[];
 G_S(temp_gps)=R(G_n_r+1:G_n_r+G_n_s)*10^9/299792458;
 
 R_R=R(G_n_r+G_n_s+1:G_n_r+G_n_s+R_n_r)*10^9/299792458;
-temp_glo=linspace(1,21,21);
+temp_glo=linspace(1,glonum,glonum);
 temp_glo(glo_d_sat)=[];
 R_S(temp_glo)=R(G_n_r+G_n_s+R_n_r+1:G_n_r+G_n_s+R_n_r+R_n_s)*10^9/299792458;
 

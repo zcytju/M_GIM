@@ -1,4 +1,4 @@
-function [G_R, G_S, E_R, E_S, EX_R, EX_S, IONC, m0, NN] = Get_nonSH_GE(fig,doy ,Sites_Info,sate,SDCB_REF,K,M,PG,PE)
+function [G_R, G_S, E_R, E_S, EX_R, EX_S, IONC, m0, NN] = Get_nonSH_GE(fig,doy ,Sites_Info,sate,SDCB_REF,K,M,PG,PE,sate_mark)
 %%  estimate satellite and receiver DCBs, ionospheric parameters, et al.
 %%  produced from 'Get_MDCB.m' in M_DCB 
 % INPUT:
@@ -26,11 +26,12 @@ path_G=['P4/regional/GPS/' doy];
 list_gps=dir([path_G '/*.mat']);
 G_n_r=length(list_gps);%the number of receivers
 %--check the number of each satellite's observations 
-G_PRN=linspace(0,0,32);
-G_S=linspace(0,0,32);
+gpsnum=sum(sate_mark.gps);
+G_PRN=linspace(0,0,gpsnum);
+G_S=linspace(0,0,gpsnum);
 for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
-    for j=1:32
+    for j=1:gpsnum
         for k=1:2880
             if GPSP4(k,j)~=0
                 G_PRN(j)=G_PRN(j)+1;
@@ -41,16 +42,16 @@ for i=1:G_n_r
 end
 gps_d_sat=find(G_PRN==0);
 if isempty(gps_d_sat)
-    G_n_s=32;
+    G_n_s=gpsnum;
 else
-    G_n_s=32-length(gps_d_sat);%the number of satellites
+    G_n_s=gpsnum-length(gps_d_sat);%the number of satellites
     disp(['doy ', doy ,' GPS PRN ',num2str(gps_d_sat) ,' have no observations.']);
     for k=length(gps_d_sat):-1:1
         gpsx(:,gps_d_sat(k))=[];gpsy(:,gps_d_sat(k))=[];gpsz(:,gps_d_sat(k))=[];
     end
 end
 
-if G_n_s==32
+if G_n_s==gpsnum
     G_Wx=0;
 else
     %Satellites DCB values must be exsist in related ionox files
@@ -65,11 +66,12 @@ path_E=['P4/regional/GAL/' doy];
 list_gal=dir([path_E '/*.mat']);
 E_n_r=length(list_gal);%the number of receivers
 %--check the number of each satellite's observations 
-E_PRN=linspace(0,0,24);
-E_S=linspace(0,0,24);
+galnum=sum(sate_mark.gal);
+E_PRN=linspace(0,0,galnum);
+E_S=linspace(0,0,galnum);
 for i=1:E_n_r
     load([path_E '/' list_gal(i).name],'-mat');
-    for j=1:24
+    for j=1:galnum
         for k=1:2880
             if GALP4(k,j)~=0
                 E_PRN(j)=E_PRN(j)+1;
@@ -80,15 +82,15 @@ for i=1:E_n_r
 end
 gal_d_sat=find(E_PRN==0,1);
 if isempty(gal_d_sat)
-    E_n_s=24;
+    E_n_s=galnum;
 else
-    E_n_s=24-length(gal_d_sat);%the number of satellites
+    E_n_s=galnum-length(gal_d_sat);%the number of satellites
     disp(['doy ', doy ,' GAL PRN ',num2str(gal_d_sat) ,' have no observations.']);
     for k=length(gal_d_sat):-1:1
         galx(:,gal_d_sat(k))=[];galy(:,gal_d_sat(k))=[];galz(:,gal_d_sat(k))=[];
     end
 end
-if E_n_s==24
+if E_n_s==galnum
     E_Wx=0;
 else
     %Satellites DCB values must be exsist in related ionox files
@@ -103,11 +105,11 @@ path_EX=['P4/regional/GALX/' doy];
 list_galx=dir([path_EX '/*.mat']);
 EX_n_r=length(list_galx);%the number of receivers
 %--check the number of each satellite's observations 
-EX_PRN=linspace(0,0,24);
-EX_S=linspace(0,0,24);
+EX_PRN=linspace(0,0,galnum);
+EX_S=linspace(0,0,galnum);
 for i=1:EX_n_r
     load([path_EX '/' list_galx(i).name],'-mat');
-    for j=1:24
+    for j=1:galnum
         for k=1:2880
             if GALXP4(k,j)~=0
                 EX_PRN(j)=EX_PRN(j)+1;
@@ -118,15 +120,15 @@ for i=1:EX_n_r
 end
 galx_d_sat=find(EX_PRN==0,1);
 if isempty(galx_d_sat)
-    EX_n_s=24;
+    EX_n_s=galnum;
 else
-    EX_n_s=24-length(galx_d_sat);%the number of satellites
+    EX_n_s=galnum-length(galx_d_sat);%the number of satellites
     disp(['doy ', doy ,' GALX PRN ',num2str(galx_d_sat) ,' have no observations.']);
     for k=length(galx_d_sat):-1:1
         galxx(:,galx_d_sat(k))=[];galxy(:,galx_d_sat(k))=[];galxz(:,galx_d_sat(k))=[];
     end
 end
-if EX_n_s==24
+if EX_n_s==galnum
     EX_Wx=0;
 else
     %Satellites DCB values must be exsist in related ionox files
@@ -226,17 +228,17 @@ U=U+C_GPS'*G_Wx+C_GAL'*E_Wx+C_GALX'*EX_Wx;
 L=L+G_Wx'*G_Wx+E_Wx'*E_Wx+EX_Wx'*EX_Wx;
 R=pinv(N)*U;
 G_R=R(1:G_n_r)*10^9/299792458;
-temp_gps=linspace(1,32,32);
+temp_gps=linspace(1,gpsnum,gpsnum);
 temp_gps(gps_d_sat)=[];
 G_S(temp_gps)=R(G_n_r+1:G_n_r+G_n_s)*10^9/299792458;
 
 E_R=R(G_n_r+G_n_s+1:G_n_r+G_n_s+E_n_r)*10^9/299792458;
-temp_gal=linspace(1,24,24);
+temp_gal=linspace(1,galnum,galnum);
 temp_gal(gal_d_sat)=[];
 E_S(temp_gal)=R(G_n_r+G_n_s+E_n_r+1:G_n_r+G_n_s+E_n_r+E_n_s)*10^9/299792458;
 
 EX_R=R(G_n_r+G_n_s+E_n_r+E_n_s+1:G_n_r+G_n_s+E_n_r+E_n_s+EX_n_r)*10^9/299792458;
-temp_galx=linspace(1,24,24);
+temp_galx=linspace(1,galnum,galnum);
 temp_galx(galx_d_sat)=[];
 EX_S(temp_galx)=R(G_n_r+G_n_s+E_n_r+E_n_s+EX_n_r+1:G_n_r+G_n_s+E_n_r+E_n_s+EX_n_r+EX_n_s)*10^9/299792458;
 

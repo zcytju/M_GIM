@@ -1,4 +1,4 @@
-function [G_R, G_S, IONC, m0, NN] = Get_SH_G(fig,doy ,Sites_Info,sate,SDCB_REF,order,PG)
+function [G_R, G_S, IONC, m0, NN] = Get_SH_G(fig,doy ,Sites_Info,sate,SDCB_REF,order,PG,sate_mark)
 %%  estimate satellite and receiver DCBs, ionospheric parameters, et al.
 %%  produced from 'Get_MDCB.m' in M_DCB 
 % INPUT:
@@ -9,6 +9,7 @@ function [G_R, G_S, IONC, m0, NN] = Get_SH_G(fig,doy ,Sites_Info,sate,SDCB_REF,o
 %     SDCB_REF: reference satellite DCBs
 %     order: the order of SH model
 %     PG: weight of GPS observations
+%     sate_mark: valid sat in all sats
 % OUTPUT:
 %     G_R, G_S: estimated GPS receiver and satellite DCBs
 %     IONC: ionospheric parameters
@@ -26,11 +27,12 @@ path_G=['P4/global/GPS/' doy];
 list_gps=dir([path_G '/*.mat']);
 G_n_r=length(list_gps);%the number of receivers
 %--check the number of each satellite's observations 
-G_PRN=linspace(0,0,32);
-G_S=linspace(0,0,32);
+gpsnum=sum(sate_mark.gps);
+G_PRN=linspace(0,0,gpsnum);
+G_S=linspace(0,0,gpsnum);
 for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
-    for j=1:32
+    for j=1:gpsnum
         for k=1:2880
             if GPSP4(k,j)~=0
                 G_PRN(j)=G_PRN(j)+1;
@@ -41,16 +43,16 @@ for i=1:G_n_r
 end
 gps_d_sat=find(G_PRN==0);
 if isempty(gps_d_sat)
-    G_n_s=32;
+    G_n_s=gpsnum;
 else
-    G_n_s=32-length(gps_d_sat);%the number of satellites
+    G_n_s=gpsnum-length(gps_d_sat);%the number of satellites
     disp(['doy ', doy ,' GPS PRN ',num2str(gps_d_sat) ,' have no observations.']);
     for k=length(gps_d_sat):-1:1
         gpsx(:,gps_d_sat(k))=[];gpsy(:,gps_d_sat(k))=[];gpsz(:,gps_d_sat(k))=[];
     end
 end
 
-if G_n_s==32
+if G_n_s==gpsnum
     G_Wx=0;
 else
     %Satellites DCB values must be exsist in related ionox files
@@ -96,7 +98,7 @@ U=U+C_GPS'*G_Wx;
 L=L+G_Wx'*G_Wx;
 R=pinv(N)*U;
 G_R=R(1:G_n_r)*10^9/299792458;
-temp_gps=linspace(1,32,32);
+temp_gps=linspace(1,gpsnum,gpsnum);
 temp_gps(gps_d_sat)=[];
 G_S(temp_gps)=R(G_n_r+1:G_n_r+G_n_s)*10^9/299792458;
 

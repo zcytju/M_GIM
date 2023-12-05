@@ -1,4 +1,4 @@
-function [G_R, G_S, C_R, C_S, IONC, m0, NN] = Get_POLY_GC(fig,doy ,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC)
+function [G_R, G_S, C_R, C_S, IONC, m0, NN] = Get_POLY_GC(fig,doy ,Sites_Info,sate,SDCB_REF,K,M,lat0,lon0,PG,PC,sate_mark)
 %%  estimate satellite and receiver DCBs, ionospheric parameters, et al.
 %%  produced from 'Get_MDCB.m' in M_DCB 
 % INPUT:
@@ -27,11 +27,12 @@ path_G=['P4/regional/GPS/' doy];
 list_gps=dir([path_G '/*.mat']);
 G_n_r=length(list_gps);%the number of receivers
 %--check the number of each satellite's observations 
-G_PRN=linspace(0,0,32);
-G_S=linspace(0,0,32);
+gpsnum=sum(sate_mark.gps);
+G_PRN=linspace(0,0,gpsnum);
+G_S=linspace(0,0,gpsnum);
 for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
-    for j=1:32
+    for j=1:gpsnum
         for k=1:2880
             if GPSP4(k,j)~=0
                 G_PRN(j)=G_PRN(j)+1;
@@ -42,16 +43,16 @@ for i=1:G_n_r
 end
 gps_d_sat=find(G_PRN==0);
 if isempty(gps_d_sat)
-    G_n_s=32;
+    G_n_s=gpsnum;
 else
-    G_n_s=32-length(gps_d_sat);%the number of satellites
+    G_n_s=gpsnum-length(gps_d_sat);%the number of satellites
     disp(['doy ', doy ,' GPS PRN ',num2str(gps_d_sat) ,' have no observations.']);
     for k=length(gps_d_sat):-1:1
         gpsx(:,gps_d_sat(k))=[];gpsy(:,gps_d_sat(k))=[];gpsz(:,gps_d_sat(k))=[];
     end
 end
 
-if G_n_s==32
+if G_n_s==gpsnum
     G_Wx=0;
 else
     %Satellites DCB values must be exsist in related ionox files
@@ -66,11 +67,12 @@ path_C=['P4/regional/BDS/' doy];
 list_bds=dir([path_C '/*.mat']);
 C_n_r=length(list_bds);%the number of receivers
 %--check the number of each satellite's observations 
-C_PRN=linspace(0,0,15);
-C_S=linspace(0,0,15);
+bdsnum=sum(sate_mark.bds);
+C_PRN=linspace(0,0,bdsnum);
+C_S=linspace(0,0,bdsnum);
 for i=1:C_n_r
     load([path_C '/' list_bds(i).name],'-mat');
-    for j=1:15
+    for j=1:bdsnum
         for k=1:2880
             if BDSP4(k,j)~=0
                 C_PRN(j)=C_PRN(j)+1;
@@ -81,15 +83,15 @@ for i=1:C_n_r
 end
 bds_d_sat=find(C_PRN==0);
 if isempty(bds_d_sat)
-    C_n_s=15;
+    C_n_s=bdsnum;
 else
-    C_n_s=15-length(bds_d_sat);%the number of satellites
+    C_n_s=bdsnum-length(bds_d_sat);%the number of satellites
     disp(['doy ', doy ,' BDS PRN ',num2str(bds_d_sat) ,' have no observations.']);
     for k=length(bds_d_sat):-1:1
         bdsx(:,bds_d_sat(k))=[];bdsy(:,bds_d_sat(k))=[];bdsz(:,bds_d_sat(k))=[];
     end
 end
-if C_n_s==15
+if C_n_s==bdsnum
     C_Wx=0;
 else
     %Satellites DCB values must be exsist in related ionox files
@@ -164,12 +166,12 @@ U=U+C_GPS'*G_Wx+C_BDS'*C_Wx;
 L=L+G_Wx'*G_Wx+C_Wx'*C_Wx;
 R=pinv(N)*U;
 G_R=R(1:G_n_r)*10^9/299792458;
-temp_gps=linspace(1,32,32);
+temp_gps=linspace(1,gpsnum,gpsnum);
 temp_gps(gps_d_sat)=[];
 G_S(temp_gps)=R(G_n_r+1:G_n_r+G_n_s)*10^9/299792458;
 
 C_R=R(G_n_r+G_n_s+1:G_n_r+G_n_s+C_n_r)*10^9/299792458;
-temp_bds=linspace(1,15,15);
+temp_bds=linspace(1,bdsnum,bdsnum);
 temp_bds(bds_d_sat)=[];
 C_S(temp_bds)=R(G_n_r+G_n_s+C_n_r+1:G_n_r+G_n_s+C_n_r+C_n_s)*10^9/299792458;
 
