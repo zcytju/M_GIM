@@ -120,14 +120,15 @@ function obs=cutobs(sate,sx,sy,sz,obs,lim,sate_mark)
 %     sate_mark: satellite status identification
 % OUTPUT£º
 %      obs: updated observation structs
+global sample_num;
 fields=fieldnames(obs);
 % cut gps obs
 if ~isnan(find(strcmp(fields, 'GPSC1W' )))
     gpsline=size(obs.GPSC2W,1);
     gpssate=size(sate_mark.gps,2);
-    if gpsline<2880
-        obs.GPSL1C(gpsline+1:2880,:)=0;obs.GPSL2W(gpsline+1:2880,:)=0;
-        obs.GPSC1W(gpsline+1:2880,:)=0;obs.GPSC2W(gpsline+1:2880,:)=0;
+    if gpsline<sample_num
+        obs.GPSL1C(gpsline+1:sample_num,:)=0;obs.GPSL2W(gpsline+1:sample_num,:)=0;
+        obs.GPSC1W(gpsline+1:sample_num,:)=0;obs.GPSC2W(gpsline+1:sample_num,:)=0;
     end
     gpsl=size(obs.GPSC2W,2);
     if gpsl<gpssate
@@ -160,7 +161,7 @@ if ~isnan(find(strcmp(fields, 'GPSC1W' )))
     gpsx=sate.gpsx;gpsy=sate.gpsy;gpsz=sate.gpsz;
 
     for i=1:gpsnum
-        for j=1:2880
+        for j=1:sample_num
             if size(obs.GPSL1C, 2) ~= gpsnum
                 continue;
             end
@@ -180,9 +181,9 @@ end
 if ~isnan(find(strcmp(fields, 'GLOC1P' )))
     gloline=size(obs.GLOC1P,1);
     glosate=size(sate_mark.glo,2);
-    if gloline<2880
-        obs.GLOL1P(gloline+1:2880,:)=0;obs.GLOL2P(gloline+1:2880,:)=0;
-        obs.GLOC1P(gloline+1:2880,:)=0;obs.GLOC2P(gloline+1:2880,:)=0;
+    if gloline<sample_num
+        obs.GLOL1P(gloline+1:sample_num,:)=0;obs.GLOL2P(gloline+1:sample_num,:)=0;
+        obs.GLOC1P(gloline+1:sample_num,:)=0;obs.GLOC2P(gloline+1:sample_num,:)=0;
     end
     glol=size(obs.GLOC1P,2);
     if glol<glosate
@@ -215,7 +216,7 @@ if ~isnan(find(strcmp(fields, 'GLOC1P' )))
     glox=sate.glox;gloy=sate.gloy;gloz=sate.gloz;
 
     for i=1:glonum
-        for j=1:2880
+        for j=1:sample_num
             if size(obs.GLOL1P, 2) ~= glonum
                 continue;
             end
@@ -235,9 +236,9 @@ end
 if ~isnan(find(strcmp(fields, 'BDSC2I' )))
     bdsline=size(obs.BDSC2I,1);
     bdssate=size(sate_mark.bds,2);
-    if bdsline<2880
-        obs.BDSL2I(bdsline+1:2880,:)=0;obs.BDSL7I(bdsline+1:2880,:)=0;
-        obs.BDSC2I(bdsline+1:2880,:)=0;obs.BDSC7I(bdsline+1:2880,:)=0;
+    if bdsline<sample_num
+        obs.BDSL2I(bdsline+1:sample_num,:)=0;obs.BDSL7I(bdsline+1:sample_num,:)=0;
+        obs.BDSC2I(bdsline+1:sample_num,:)=0;obs.BDSC7I(bdsline+1:sample_num,:)=0;
     end
     bdsl=size(obs.BDSC2I,2);
     if bdsl<bdssate
@@ -270,7 +271,7 @@ if ~isnan(find(strcmp(fields, 'BDSC2I' )))
     bdsx=sate.bdsx;bdsy=sate.bdsy;bdsz=sate.bdsz;
 
     for i=1:bdsnum
-        for j=1:2880
+        for j=1:sample_num
             if size(obs.BDSL2I, 2) ~= bdsnum
                 continue;
             end
@@ -291,9 +292,9 @@ if ~isnan(find(strcmp(fields, 'GALC1X' )))
     galxline=size(obs.GALC1X,1);
     galsate=size(sate_mark.gal,2);
     
-    if galxline<2880
-        obs.GALL1X(galxline+1:2880,:)=0;obs.GALL5X(galxline+1:2880,:)=0;
-        obs.GALC1X(galxline+1:2880,:)=0;obs.GALC5X(galxline+1:2880,:)=0;
+    if galxline<sample_num
+        obs.GALL1X(galxline+1:sample_num,:)=0;obs.GALL5X(galxline+1:sample_num,:)=0;
+        obs.GALC1X(galxline+1:sample_num,:)=0;obs.GALC5X(galxline+1:sample_num,:)=0;
     end
     gall=size(obs.GALC1X,2);
     if gall<galsate
@@ -326,7 +327,7 @@ if ~isnan(find(strcmp(fields, 'GALC1X' )))
     galx=sate.galx;galy=sate.galy;galz=sate.galz;
 
     for i=1:galnum
-        for j=1:2880
+        for j=1:sample_num
             if size(obs.GALL1X, 2) ~= galnum
                 continue;
             end
@@ -344,9 +345,9 @@ if ~isnan(find(strcmp(fields, 'GALC1X' )))
 elseif ~isnan(find(strcmp(fields, 'GALC1C' )))
     galline=size(obs.GALC1C,1);
     galsate=size(sate_mark.gal,2);
-    if galline<2880
-        obs.GALL1C(galline+1:2880,:)=0;obs.GALL5Q(galline+1:2880,:)=0;
-        obs.GALC1C(galline+1:2880,:)=0;obs.GALC5Q(galline+1:2880,:)=0;
+    if galline<sample_num
+        obs.GALL1C(galline+1:sample_num,:)=0;obs.GALL5Q(galline+1:sample_num,:)=0;
+        obs.GALC1C(galline+1:sample_num,:)=0;obs.GALC5Q(galline+1:sample_num,:)=0;
     end
     gall=size(obs.GALC1C,2);
     if gall<galsate
@@ -380,7 +381,7 @@ elseif ~isnan(find(strcmp(fields, 'GALC1C' )))
     galx=sate.galx;galy=sate.galy;galz=sate.galz;
 
     for i=1:galnum
-        for j=1:2880
+        for j=1:sample_num
             if size(obs.GALL1C, 2) ~= galnum
                 continue;
             end

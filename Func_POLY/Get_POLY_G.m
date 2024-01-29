@@ -18,6 +18,7 @@ function [G_R, G_S, IONC, m0, NN] = Get_POLY_G(fig,doy,Sites_Info,sate,SDCB_REF,
 %% written by Jin R et al., 2012/5/26, doi:10.1007/s10291-012-0279-3
 %% modified by Zhou C. et al., 2021/12/14
 %% --------------------------------------------------------------------------
+global sample_num;
 Coor=Sites_Info.coor;
 stations=Sites_Info.name;
 doys=Sites_Info.doy;
@@ -32,7 +33,7 @@ G_S=linspace(0,0,gpsnum);
 for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
     for j=1:gpsnum
-        for k=1:2880
+        for k=1:sample_num
             if GPSP4(k,j)~=0
                 G_PRN(j)=G_PRN(j)+1;
             end
@@ -108,9 +109,10 @@ end
 function [MC,l]=Get_Matrix(fig,P4,x,y,z,sx,sy,sz,n_r,n_s,ith,K,M,lat0,lon0)
 MC=[];
 l=[];
+global sample_num;
 num=(K+1)*(M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:n_s                %-----------------------j is satellite number
         parfor k=figt*i-(figt-1):figt*i %-------------------------k is epoch number

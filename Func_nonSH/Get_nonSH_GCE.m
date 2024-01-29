@@ -17,6 +17,7 @@ function [G_R, G_S, E_R, E_S, EX_R, EX_S, C_R, C_S, IONC, m0, NN] = Get_nonSH_GC
 %% written by Jin R et al., 2012/5/26, doi:10.1007/s10291-012-0279-3
 %% modified by Zhou C. et al., 2021/12/14
 %% --------------------------------------------------------------------------
+global sample_num;
 Coor=Sites_Info.coor;
 stations=Sites_Info.name;
 doys=Sites_Info.doy;
@@ -32,7 +33,7 @@ G_S=linspace(0,0,gpsnum);
 for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
     for j=1:gpsnum
-        for k=1:2880
+        for k=1:sample_num
             if GPSP4(k,j)~=0
                 G_PRN(j)=G_PRN(j)+1;
             end
@@ -72,7 +73,7 @@ E_S=linspace(0,0,galnum);
 for i=1:E_n_r
     load([path_E '/' list_gal(i).name],'-mat');
     for j=1:galnum
-        for k=1:2880
+        for k=1:sample_num
             if GALP4(k,j)~=0
                 E_PRN(j)=E_PRN(j)+1;
             end
@@ -110,7 +111,7 @@ EX_S=linspace(0,0,galnum);
 for i=1:EX_n_r
     load([path_EX '/' list_galx(i).name],'-mat');
     for j=1:galnum
-        for k=1:2880
+        for k=1:sample_num
             if GALXP4(k,j)~=0
                 EX_PRN(j)=EX_PRN(j)+1;
             end
@@ -149,7 +150,7 @@ C_S=linspace(0,0,bdsnum);
 for i=1:C_n_r
     load([path_C '/' list_bds(i).name],'-mat');
     for j=1:bdsnum
-        for k=1:2880
+        for k=1:sample_num
             if BDSP4(k,j)~=0
                 C_PRN(j)=C_PRN(j)+1;
             end
@@ -324,9 +325,10 @@ end
 %% ------------------------------sub_function--------------------------------
 function [MC,l]=Get_GPSMatrix(fig,GPSP4,x,y,z,sx,sy,sz,gps_n_r,gal_n_r,galx_n_r,bds_n_r,gps_n_s,gal_n_s,galx_n_s,bds_n_s,ith,K,M)
 MC=[];l=[];
+global sample_num;
 num=(K+1)^2-(K-M)*(K-M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:gps_n_s                %----j is satellite number
         parfor k=figt*i-(figt-1):figt*i %----k is epoch number
@@ -353,9 +355,10 @@ end
 %% ------------------------------sub_function--------------------------------
 function [MC,l]=Get_GALMatrix(fig,GALP4,x,y,z,sx,sy,sz,gps_n_r,gal_n_r,galx_n_r,bds_n_r,gps_n_s,gal_n_s,galx_n_s,bds_n_s,ith,K,M)
 MC=[];l=[];
+global sample_num;
 num=(K+1)^2-(K-M)*(K-M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:gal_n_s                %----j is satellite number
         parfor k=figt*i-(figt-1):figt*i %----k is epoch number
@@ -382,9 +385,10 @@ end
 %% ------------------------------sub_function--------------------------------
 function [MC,l]=Get_GALXMatrix(fig,GALXP4,x,y,z,sx,sy,sz,gps_n_r,gal_n_r,galx_n_r,bds_n_r,gps_n_s,gal_n_s,galx_n_s,bds_n_s,ith,K,M)
 MC=[];l=[];
+global sample_num;
 num=(K+1)^2-(K-M)*(K-M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:galx_n_s                %----j is satellite number
         parfor k=figt*i-(figt-1):figt*i %----k is epoch number
@@ -411,9 +415,10 @@ end
 %% ------------------------------sub_function--------------------------------
 function [MC,l]=Get_BDSMatrix(fig,BDSP4,x,y,z,sx,sy,sz,gps_n_r,gal_n_r,galx_n_r,bds_n_r,gps_n_s,gal_n_s,galx_n_s,bds_n_s,ith,K,M)
 MC=[];l=[];
+global sample_num;
 num=(K+1)^2-(K-M)*(K-M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:bds_n_s                %----j is satellite number
         parfor k=figt*i-(figt-1):figt*i %----k is epoch number

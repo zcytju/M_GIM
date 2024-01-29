@@ -17,6 +17,7 @@ function [G_R, G_S, C_R, C_S, IONC, m0, NN] = Get_nonSH_GC(fig,doy ,Sites_Info,s
 %% written by Jin R et al., 2012/5/26, doi:10.1007/s10291-012-0279-3
 %% modified by Zhou C. et al., 2021/12/14
 %% --------------------------------------------------------------------------
+global sample_num;
 Coor=Sites_Info.coor;
 stations=Sites_Info.name;
 doys=Sites_Info.doy;
@@ -32,7 +33,7 @@ G_S=linspace(0,0,gpsnum);
 for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
     for j=1:gpsnum
-        for k=1:2880
+        for k=1:sample_num
             if GPSP4(k,j)~=0
                 G_PRN(j)=G_PRN(j)+1;
             end
@@ -72,7 +73,7 @@ C_S=linspace(0,0,bdsnum);
 for i=1:C_n_r
     load([path_C '/' list_bds(i).name],'-mat');
     for j=1:bdsnum
-        for k=1:2880
+        for k=1:sample_num
             if BDSP4(k,j)~=0
                 C_PRN(j)=C_PRN(j)+1;
             end
@@ -95,7 +96,7 @@ if C_n_s==bdsnum
 else
     %Satellites DCB values must be exsist in related ionox files
     index= SDCB_REF.doy==str2double(doy); 
-    C_Wx=-sum(SDCB_REF.bds(index,bds_d_sat));
+    C_Wx=-sum(SDCB_REF.bds(index,bds_d_sat));    
     C_S(bds_d_sat)=SDCB_REF.bds(index,bds_d_sat);
 end
 
@@ -185,9 +186,10 @@ end
 %% ------------------------------sub_function--------------------------------
 function [MC,l]=Get_GPSMatrix(fig,GPSP4,x,y,z,sx,sy,sz,gps_n_r,bds_n_r,gps_n_s,bds_n_s,ith,K,M)
 MC=[];l=[];
+global sample_num;
 num=(K+1)^2-(K-M)*(K-M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:gps_n_s                %----j is satellite number
         parfor k=figt*i-(figt-1):figt*i %----k is epoch number
@@ -215,9 +217,10 @@ end
 %% ------------------------------sub_function--------------------------------
 function [MC,l]=Get_BDSMatrix(fig,BDSP4,x,y,z,sx,sy,sz,gps_n_r,bds_n_r,gps_n_s,bds_n_s,ith,K,M)
 MC=[];l=[];
+global sample_num;
 num=(K+1)^2-(K-M)*(K-M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:bds_n_s                %----j is satellite number
         parfor k=figt*i-(figt-1):figt*i %----k is epoch number

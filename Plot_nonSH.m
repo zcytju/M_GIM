@@ -10,7 +10,7 @@ latlim=2.5;   lonlim=5;
 VVTEC = Get_VTEC(fig, 2.5, 5, IONC, NN, m0, K, M, lat2, lat1, lon1, lon2);
 VTEC=VVTEC;VTEC(VTEC(:,4)<0,4)=0.05;
 RMS=[VTEC(:,1:3),VTEC(:,5)];
-% % read CODE final GIMs (codg2750.19i) as reference
+% % read CODE final GIMs (codg2750.19i) as reference 
 disp('--------> Read CODE final GIMs as reference !');
 IGSData=read_ionex(fig,'TEC');
 AreaTEC=Get_areaTEC(fig,lat2,lat1,lon1,lon2,IGSData);

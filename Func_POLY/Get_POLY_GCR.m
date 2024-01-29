@@ -18,6 +18,7 @@ function [G_R, G_S, C_R, C_S, R_R, R_S, IONC, m0, NN] = Get_POLY_GCR(fig,doy ,Si
 %% written by Jin R et al., 2012/5/26, doi:10.1007/s10291-012-0279-3
 %% modified by Zhou C. et al., 2021/12/14
 %% --------------------------------------------------------------------------
+global sample_num;
 Coor=Sites_Info.coor;
 stations=Sites_Info.name;
 doys=Sites_Info.doy;
@@ -33,7 +34,7 @@ G_S=linspace(0,0,gpsnum);
 for i=1:G_n_r
     load([path_G '/' list_gps(i).name],'-mat');
     for j=1:gpsnum
-        for k=1:2880
+        for k=1:sample_num
             if GPSP4(k,j)~=0
                 G_PRN(j)=G_PRN(j)+1;
             end
@@ -73,7 +74,7 @@ C_S=linspace(0,0,bdsnum);
 for i=1:C_n_r
     load([path_C '/' list_bds(i).name],'-mat');
     for j=1:bdsnum
-        for k=1:2880
+        for k=1:sample_num
             if BDSP4(k,j)~=0
                 C_PRN(j)=C_PRN(j)+1;
             end
@@ -112,7 +113,7 @@ R_S=linspace(0,0,glonum);
 for i=1:R_n_r
     load([path_R '/' list_glo(i).name],'-mat');
     for j=1:glonum
-        for k=1:2880
+        for k=1:sample_num
             if GLOP4(k,j)~=0
                 GLO_PRN(j)=GLO_PRN(j)+1;
             end
@@ -256,9 +257,10 @@ end
 %% ------------------------------sub_function--------------------------------
 function [MC,l]=Get_GPSMatrix(fig,GPSP4,x,y,z,sx,sy,sz,gps_n_r,bds_n_r,glo_n_r,gps_n_s,bds_n_s,glo_n_s,ith,K,M,lat0,lon0)
 MC=[];l=[];
+global sample_num;
 num=(K+1)*(M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:gps_n_s                %-----------------------j is satellite number
         parfor k=figt*i-(figt-1):figt*i %-------------------------k is epoch number
@@ -285,9 +287,10 @@ end
 %% ------------------------------sub_function--------------------------------
 function [MC,l]=Get_BDSMatrix(fig,BDSP4,x,y,z,sx,sy,sz,gps_n_r,bds_n_r,glo_n_r,gps_n_s,bds_n_s,glo_n_s,ith,K,M,lat0,lon0)
 MC=[];l=[];
+global sample_num;
 num=(K+1)*(M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:bds_n_s                %-----------------------j is satellite number
         parfor k=figt*i-(figt-1):figt*i %-------------------------k is epoch number
@@ -315,6 +318,7 @@ end
 %% ------------------------------sub_function--------------------------------
 function [MC,l]=Get_GLOMatrix(fig,GLOP4,x,y,z,sx,sy,sz,gps_n_r,bds_n_r,glo_n_r,gps_n_s,bds_n_s,glo_n_s,ith,K,M,lat0,lon0)
 MC=[];l=[];
+global sample_num;
 R=[-9.76307424,-9.72883589,-9.79050823,-9.76307424,-9.79050823,...
       -9.79737274,-9.74252401,-9.75622176,-9.74937168,-9.74252401,...
       -9.70832174,-9.75622176,-9.74937168,-9.78364612,-9.73567875,...
@@ -322,7 +326,7 @@ R=[-9.76307424,-9.72883589,-9.79050823,-9.76307424,-9.79050823,...
       -9.76992913];
 num=(K+1)*(M+1);
 [sb,sl]=XYZtoBLH(sx,sy,sz);
-figt=2880/fig;
+figt=sample_num/fig;
 for i=1:fig
     for j=1:glo_n_s                %-----------------------j is satellite number
         parfor k=figt*i-(figt-1):figt*i %-------------------------k is epoch number

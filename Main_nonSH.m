@@ -16,6 +16,8 @@ system='GCER';
 lim=10;
 %--number of ionosphere model parameter groups
 fig=24;
+% --sampling interval
+sample_interval=30;
 %--nonintergral SH model order and degree
 K=6; M=4;
 %--the weight of each system observation
@@ -25,7 +27,9 @@ Corenum=2;
 
 tic
 %Step one--------------------Read RINEX files------------------------------
-disp('MDCB(multi-stations) starts running!');
+disp('M_GIM starts running!');
+global sample_num;
+sample_num=24*60^2/sample_interval;
 % --L1,L2,P1,P2 and coordinates of GPS receviers are obtained by this step
 r_opath='OBS\regional';
 disp('Step one: read rinex files !');
